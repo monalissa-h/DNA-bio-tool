@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DNA Bioinformatics Toolkit</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #0f0f0f;
+    color: white;
+    display: flex;
+    justify-content: center;
+    padding: 30px;
+}
+
+.container {
+    width: 600px;
+    background: #1c1c1c;
+    padding: 20px;
+    border-radius: 12px;
+}
+
+h2 { text-align: center; }
+
+textarea {
+    width: 100%;
+    height: 120px;
+    margin-top: 10px;
+    padding: 10px;
+    font-size: 14px;
+}
+
+button {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.output {
+    margin-top: 15px;
+    background: black;
+    padding: 10px;
+    min-height: 120px;
+    white-space: pre-wrap;
+}
+
+input[type="file"] {
+    margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h2>🧬 DNA Bioinformatics Toolkit</h2>
+
+<textarea id="dnaInput" placeholder="Enter DNA sequence or upload FASTA file..."></textarea>
+
+<input type="file" id="fileInput" accept=".fasta,.txt">
+
+<button onclick="runAll()">Run Analysis</button>
+
+<div class="output" id="output"></div>
+</div>
+
+<script>
+// ---------- Helpers ----------
+function cleanDNA(seq) {
+    return seq.toUpperCase().replace(/\s/g, "");
+}
+
+function validateDNA(seq) {
+    return /^[ATGC]+$/.test(seq);
+}
+
+// ---------- RNA ----------
+function dnaToRna(seq) {
+    return seq.replace(/T/g, "U");
+}
+
+// ---------- Reverse Complement ----------
+function reverseComplement(seq) {
+    const map = {A:"T", T:"A", G:"C", C:"G"};
+    let comp = "";
+    for (let b of seq) comp += map[b] || "N";
+    return comp.split("").reverse().join("");
+}
+
+// ---------- GC Content ----------
+function gcContent(seq) {
+    let g = (seq.match(/G/g) || []).length;
+    let c = (seq.match(/C/g) || []).length;
+    return ((g + c) / seq.length * 100).toFixed(2);
+}
+
+// ---------- FASTA Reader ----------
+function parseFASTA(text) {
+    let lines = text.split("\n");
+    let seq = "";
+
+    for (let line of lines) {
+        if (!line.startsWith(">")) {
+            seq += line.trim();
+        }
+    }
+    return seq;
+}
+
+// ---------- Main ----------
+function runAll() {
+    let input = document.getElementById("dnaInput").value;
+
+    // If file uploaded
+    let file = document.getElementById("fileInput").files[0];
+
+    if (file) {
+        let reader = new FileReader();
+        reader.onload = function(e) {
+            let seq = parseFASTA(e.target.result);
+            process(seq);
+        };
+        reader.readAsText(file);
+    } else {
+        process(input);
+    }
+}
+
+function process(seq) {
+    seq = cleanDNA(seq);
+
+    if (!validateDNA(seq)) {
+        document.getElementById("output").innerText =
+            "⚠️ Invalid DNA sequence! Use only A, T, G, C.";
+        return;
+    }
+
+    let rna = dnaToRna(seq);
+    let rev = reverseComplement(seq);
+    let gc = gcContent(seq);
+
+    document.getElementById("output").innerText =
+`DNA Sequence:
+${seq}
+
+RNA Sequence:
+${rna}
+
+Reverse Complement:
+${rev}
+
+GC Content:
+${gc}%`;
+}
+</script>
+
+</body>
+</html>
