@@ -68,6 +68,7 @@ input[type="file"] {
 </div>
 
 <script>
+
 // ---------- Helpers ----------
 function cleanDNA(seq) {
     return seq.toUpperCase().replace(/\s/g, "");
@@ -97,6 +98,41 @@ function gcContent(seq) {
     return ((g + c) / seq.length * 100).toFixed(2);
 }
 
+// ---------- CODON TABLE ----------
+const codonTable = {
+    "TTT":"F","TTC":"F","TTA":"L","TTG":"L",
+    "CTT":"L","CTC":"L","CTA":"L","CTG":"L",
+    "ATT":"I","ATC":"I","ATA":"I","ATG":"M",
+    "GTT":"V","GTC":"V","GTA":"V","GTG":"V",
+
+    "TCT":"S","TCC":"S","TCA":"S","TCG":"S",
+    "CCT":"P","CCC":"P","CCA":"P","CCG":"P",
+    "ACT":"T","ACC":"T","ACA":"T","ACG":"T",
+    "GCT":"A","GCC":"A","GCA":"A","GCG":"A",
+
+    "TAT":"Y","TAC":"Y","TAA":"*","TAG":"*",
+    "CAT":"H","CAC":"H","CAA":"Q","CAG":"Q",
+    "AAT":"N","AAC":"N","AAA":"K","AAG":"K",
+    "GAT":"D","GAC":"D","GAA":"E","GAG":"E",
+
+    "TGT":"C","TGC":"C","TGA":"*","TGG":"W",
+    "CGT":"R","CGC":"R","CGA":"R","CGG":"R",
+    "AGT":"S","AGC":"S","AGA":"R","AGG":"R",
+    "GGT":"G","GGC":"G","GGA":"G","GGG":"G"
+};
+
+// ---------- PROTEIN TRANSLATION ----------
+function translateDNA(seq) {
+    let protein = "";
+
+    for (let i = 0; i < seq.length - 2; i += 3) {
+        let codon = seq.substring(i, i + 3);
+        protein += codonTable[codon] || "X";
+    }
+
+    return protein;
+}
+
 // ---------- FASTA Reader ----------
 function parseFASTA(text) {
     let lines = text.split("\n");
@@ -110,11 +146,9 @@ function parseFASTA(text) {
     return seq;
 }
 
-// ---------- Main ----------
+// ---------- MAIN ----------
 function runAll() {
     let input = document.getElementById("dnaInput").value;
-
-    // If file uploaded
     let file = document.getElementById("fileInput").files[0];
 
     if (file) {
@@ -141,6 +175,7 @@ function process(seq) {
     let rna = dnaToRna(seq);
     let rev = reverseComplement(seq);
     let gc = gcContent(seq);
+    let protein = translateDNA(seq);
 
     document.getElementById("output").innerText =
 `DNA Sequence:
@@ -153,8 +188,12 @@ Reverse Complement:
 ${rev}
 
 GC Content:
-${gc}%`;
+${gc}%
+
+Protein (1-letter AA):
+${protein}`;
 }
+
 </script>
 
 </body>
