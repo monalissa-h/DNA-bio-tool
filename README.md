@@ -102,8 +102,6 @@ Built as a **bioinformatics + coding learning project**, combining:
 - Software engineering 💻  
 - Experimental tools development ⚙️
 
-I first built this bioinformatics tool in Perl during a programming course at the University of Glasgow while completing my PhD, to support my PCR and DNA sequence analysis workflows. Recently, I rebuilt it with AI using HTML, CSS, and JavaScript as a simple browser-based application. This version also supports DNA sequence file uploads for quick and accessible analysis.
-
 ---
 
 ## ⭐ Purpose
